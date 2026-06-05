@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DBlessed Laundry and Services Ltd</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans',sans-serif;background:#F0F4F8;min-height:100vh}
+  ::-webkit-scrollbar{width:6px}
+  ::-webkit-scrollbar-track{background:#f1f1f1}
+  ::-webkit-scrollbar-thumb{background:#C9962C;border-radius:3px}
+  button{font-family:'Plus Jakarta Sans',sans-serif}
+  input,select,textarea{font-family:'Plus Jakarta Sans',sans-serif}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .fade-in{animation:fadeIn 0.3s ease}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+  .pulse{animation:pulse 2s infinite}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const C = {
+  navy:"#0A1628", navyL:"#112240", blue:"#1E4D8C", blueL:"#2563EB",
+  gold:"#C9962C", goldL:"#F5C842", white:"#FFFFFF",
+  g50:"#F8FAFC", g100:"#F1F5F9", g200:"#E2E8F0", g400:"#94A3B8",
+  g600:"#475569", g800:"#1E293B",
+  ok:"#10B981", warn:"#F59E0B", err:"#EF4444", info:"#3B82F6"
+};
+
+const STATUSES = [
+  {key:"received",label:"Order Received",icon:"📋",color:"#6366F1"},
+  {key:"pickup_scheduled",label:"Pickup Scheduled",icon:"📅",color:"#8B5CF6"},
+  {key:"picked_up",label:"Picked Up",icon:"🚗",color:"#EC4899"},
+  {key:"washing",label:"Washing",icon:"🫧",color:"#3B82F6"},
+  {key:"drying",label:"Drying",icon:"💨",color:"#06B6D4"},
+  {key:"ironing",label:"Ironing",icon:"♨️",color:"#F59E0B"},
+  {key:"quality_check",label:"Quality Check",icon:"✅",color:"#10B981"},
+  {key:"ready",label:"Ready for Delivery",icon:"📦",color:"#C9962C"},
+  {key:"delivered",label:"Delivered",icon:"🎉",color:"#10B981"},
+];
+
+const SERVICES = [
+  {id:1,name:"Wash & Fold",price:1200,unit:"per kg",icon:"👕"},
+  {id:2,name:"Wash & Iron",price:1800,unit:"per kg",icon:"👔"},
+  {id:3,name:"Dry Cleaning",price:3500,unit:"per item",icon:"🧥"},
+  {id:4,name:"Ironing Only",price:800,unit:"per kg",icon:"♨️"},
+  {id:5,name:"Duvet/Bedding",price:4500,unit:"per piece",icon:"🛏️"},
+  {id:6,name:"Curtains",price:5000,unit:"per set",icon:"🪟"},
+  {id:7,name:"Sneaker Wash",price:2500,unit:"per pair",icon:"👟"},
+  {id:8,name:"Carpet Cleaning",price:8000,unit:"per sqm",icon:"🔲"},
+];
+
+const PLANS = [
+  {id:"basic",name:"Basic",kg:25,price:22000,color:C.blue},
+  {id:"standard",name:"Standard",kg:50,price:40000,color:C.gold,popular:true},
+  {id:"premium",name:"Premium",kg:100,price:70000,color:C.navy},
+];
+
+const ORDERS = [
+  {id:"DBL-001",customer:"Adaeze Okonkwo",phone:"0812 345 6789",services:["Wash & Fold"],weight:4.5,status:"washing",amount:9000,date:"2024-06-04",address:"12 Banana Island, Lagos"},
+  {id:"DBL-002",customer:"Emeka Nwosu",phone:"0703 456 7890",services:["Dry Cleaning"],weight:2,status:"quality_check",amount:7000,date:"2024-06-04",address:"5 Victoria Island, Lagos"},
+  {id:"DBL-003",customer:"Fatima Aliyu",phone:"0901 234 5678",services:["Wash & Iron"],weight:6,status:"ready",amount:10800,date:"2024-06-03",address:"8 Lekki Phase 1, Lagos"},
+  {id:"DBL-004",customer:"Chidi Okafor",phone:"0817 654 3210",services:["Duvet/Bedding"],weight:1,status:"delivered",amount:4500,date:"2024-06-03",address:"3 Ikoyi Close, Lagos"},
+  {id:"DBL-005",customer:"Ngozi Eze",phone:"0705 111 2222",services:["Wash & Fold"],weight:3,status:"pickup_scheduled",amount:3600,date:"2024-06-04",address:"22 Surulere, Lagos"},
+];
+
+const INVENTORY = [
+  {id:1,name:"Ariel Detergent 5kg",cat:"Detergent",stock:45,unit:"bags",min:10,cost:8500},
+  {id:2,name:"Comfort Softener 5L",cat:"Softener",stock:8,unit:"bottles",min:10,cost:6200},
+  {id:3,name:"Polythene Bags",cat:"Packaging",stock:12,unit:"rolls",min:5,cost:1500},
+  {id:4,name:"Wire Hangers (50pcs)",cat:"Hangers",stock:3,unit:"packs",min:5,cost:900},
+  {id:5,name:"Laundry Bags Large",cat:"Bags",stock:25,unit:"pieces",min:8,cost:2200},
+  {id:6,name:"Stain Remover Spray",cat:"Consumable",stock:14,unit:"bottles",min:6,cost:3800},
+];
+
+const CUSTOMERS = [
+  {id:1,name:"Adaeze Okonkwo",email:"adaeze@email.com",phone:"0812 345 6789",orders:12,spent:87500,plan:"Standard",points:875,joined:"Jan 2024"},
+  {id:2,name:"Emeka Nwosu",email:"emeka@email.com",phone:"0703 456 7890",orders:8,spent:56000,plan:"Basic",points:560,joined:"Feb 2024"},
+  {id:3,name:"Fatima Aliyu",email:"fatima@email.com",phone:"0901 234 5678",orders:20,spent:145000,plan:"Premium",points:1450,joined:"Nov 2023"},
+  {id:4,name:"Chidi Okafor",email:"chidi@email.com",phone:"0817 654 3210",orders:5,spent:22500,plan:null,points:225,joined:"Apr 2024"},
+  {id:5,name:"Ngozi Eze",email:"ngozi@email.com",phone:"0705 111 2222",orders:15,spent:98000,plan:"Standard",points:980,joined:"Dec 2023"},
+];
+
+const fc = n => `₦${n.toLocaleString()}`;
+const av = (n,c) => n.split(" ").map(x=>x[0]).join("").slice(0,2);
+
+// UI Components
+const Badge = ({color,children})=>(
+  <span style={{display:"inline-flex",alignItems:"center",gap:3,padding:"2px 9px",borderRadius:20,fontSize:11,fontWeight:700,background:color+"22",color,border:`1px solid ${color}44`}}>{children}</span>
+);
+
+const Card = ({children,style={}})=>(
+  <div className="fade-in" style={{background:"rgba(255,255,255,0.97)",borderRadius:16,padding:"18px 20px",boxShadow:"0 2px 16px rgba(10,22,40,0.08)",border:"1px solid rgba(226,232,240,0.8)",...style}}>{children}</div>
+);
+
+const Btn = ({children,onClick,color,outline,size="md",style={},disabled})=>(
+  <button onClick={onClick} disabled={disabled} style={{padding:size==="sm"?"5px 13px":size==="lg"?"13px 28px":"8px 18px",borderRadius:9,border:outline?`2px solid ${color||C.blue}`:"none",background:outline?"transparent":(color||C.blue),color:outline?(color||C.blue):"#fff",fontWeight:700,fontSize:size==="sm"?12:14,cursor:disabled?"not-allowed":"pointer",opacity:disabled?0.5:1,transition:"all 0.2s",...style}}>{children}</button>
+);
+
+const Stat = ({label,value,icon,color,trend})=>(
+  <Card style={{flex:1,minWidth:140}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+      <div>
+        <div style={{fontSize:11,color:C.g400,fontWeight:700,textTransform:"uppercase",letterSpacing:.8}}>{label}</div>
+        <div style={{fontSize:24,fontWeight:900,color:C.navy,marginTop:3,lineHeight:1.1}}>{value}</div>
+        {trend&&<div style={{fontSize:11,color:trend>0?C.ok:C.err,marginTop:3}}>{trend>0?"↑":"↓"} {Math.abs(trend)}% this month</div>}
+      </div>
+      <div style={{width:40,height:40,borderRadius:11,background:(color||C.blue)+"18",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{icon}</div>
+    </div>
+  </Card>
+);
+
+const Progress = ({value,max,color})=>(
+  <div style={{background:C.g200,borderRadius:99,height:6,overflow:"hidden"}}>
+    <div style={{width:`${Math.min(100,(value/max)*100)}%`,height:"100%",background:color||C.blue,borderRadius:99}}/>
+  </div>
+);
+
+const StatusBadge = ({status})=>{
+  const s=STATUSES.find(x=>x.key===status);
+  return s?<Badge color={s.color}>{s.icon} {s.label}</Badge>:null;
+};
+
+const SH = ({title,subtitle,action})=>(
+  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:16}}>
+    <div>
+      <div style={{fontSize:16,fontWeight:800,color:C.navy}}>{title}</div>
+      {subtitle&&<div style={{fontSize:12,color:C.g400,marginTop:2}}>{subtitle}</div>}
+    </div>
+    {action}
+  </div>
+);
+
+// Sidebar
+const MENUS = {
+  admin:[
+    {id:"dashboard",icon:"📊",label:"Dashboard"},
+    {id:"orders",icon:"📋",label:"Orders"},
+    {id:"customers",icon:"👥",label:"Customers"},
+    {id:"services",icon:"🧺",label:"Services & Pricing"},
+    {id:"riders",icon:"🚗",label:"Riders"},
+    {id:"inventory",icon:"📦",label:"Inventory"},
+    {id:"subscriptions",icon:"🔄",label:"Subscriptions"},
+    {id:"pos",icon:"💳",label:"POS System"},
+    {id:"reports",icon:"📈",label:"Reports"},
+    {id:"notifications",icon:"🔔",label:"Notifications"},
+    {id:"staff",icon:"👤",label:"Staff & Roles"},
+  ],
+  customer:[
+    {id:"home",icon:"🏠",label:"Home"},
+    {id:"place_order",icon:"➕",label:"Place Order"},
+    {id:"my_orders",icon:"📋",label:"My Orders"},
+    {id:"track",icon:"📍",label:"Track Order"},
+    {id:"pricing",icon:"💰",label:"Pricing"},
+    {id:"myplan",icon:"🔄",label:"My Plan"},
+    {id:"loyalty",icon:"⭐",label:"Rewards"},
+    {id:"referral",icon:"🎁",label:"Refer & Earn"},
+  ],
+  rider:[
+    {id:"rider_home",icon:"🏠",label:"Dashboard"},
+    {id:"pickups",icon:"📦",label:"Pickups"},
+    {id:"deliveries",icon:"🚗",label:"Deliveries"},
+  ],
+  operations:[
+    {id:"ops_home",icon:"🏠",label:"Dashboard"},
+    {id:"processing",icon:"⚙️",label:"Processing"},
+    {id:"scanning",icon:"📷",label:"Scan Orders"},
+  ],
+};
+
+const Sidebar = ({role,setRole,active,setActive,collapsed,setCollapsed})=>(
+  <div style={{width:collapsed?60:220,minHeight:"100vh",background:C.navy,display:"flex",flexDirection:"column",transition:"width 0.25s",boxShadow:"4px 0 24px rgba(0,0,0,0.22)",flexShrink:0,zIndex:10}}>
+    <div style={{padding:collapsed?"18px 10px":"18px 16px",borderBottom:"1px solid rgba(255,255,255,0.08)"}}>
+      <div style={{display:"flex",alignItems:"center",gap:8}}>
+        <div style={{width:36,height:36,borderRadius:9,background:`linear-gradient(135deg,${C.gold},${C.goldL})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,flexShrink:0}}>👕</div>
+        {!collapsed&&<div><div style={{color:C.goldL,fontWeight:800,fontSize:12}}>DBlessed</div><div style={{color:"rgba(255,255,255,0.4)",fontSize:10}}>Laundry & Services</div></div>}
+      </div>
+    </div>
+    {!collapsed&&(
+      <div style={{padding:"10px 12px",borderBottom:"1px solid rgba(255,255,255,0.08)"}}>
+        <div style={{fontSize:9,color:"rgba(255,255,255,0.35)",marginBottom:5,fontWeight:700,textTransform:"uppercase",letterSpacing:1}}>Switch Role</div>
+        <select value={role} onChange={e=>{setRole(e.target.value);setActive(e.target.value==="admin"?"dashboard":e.target.value==="customer"?"home":e.target.value==="rider"?"rider_home":"ops_home");}}
+          style={{width:"100%",padding:"6px 8px",borderRadius:7,background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.15)",color:"#fff",fontSize:11,cursor:"pointer"}}>
+          <option value="admin">🛡️ Admin</option>
+          <option value="customer">👤 Customer</option>
+          <option value="rider">🚗 Rider</option>
+          <option value="operations">⚙️ Operations</option>
+        </select>
+      </div>
+    )}
+    <nav style={{flex:1,padding:"10px 6px",overflowY:"auto"}}>
+      {(MENUS[role]||MENUS.admin).map(item=>(
+        <button key={item.id} onClick={()=>setActive(item.id)}
+          style={{display:"flex",alignItems:"center",gap:collapsed?0:9,width:"100%",padding:collapsed?"9px 0":"9px 10px",justifyContent:collapsed?"center":"flex-start",borderRadius:9,border:"none",cursor:"pointer",marginBottom:2,background:active===item.id?"rgba(201,150,44,0.15)":"transparent",color:active===item.id?C.goldL:"rgba(255,255,255,0.5)",fontSize:13,fontWeight:active===item.id?700:500,borderLeft:active===item.id?`3px solid ${C.gold}`:"3px solid transparent"}}>
+          <span style={{fontSize:15}}>{item.icon}</span>
+          {!collapsed&&<span>{item.label}</span>}
+        </button>
+      ))}
+    </nav>
+    <div style={{padding:"10px 6px",borderTop:"1px solid rgba(255,255,255,0.08)"}}>
+      <button onClick={()=>setCollapsed(!collapsed)} style={{display:"flex",alignItems:"center",gap:8,width:"100%",padding:"8px 10px",borderRadius:9,border:"none",background:"transparent",color:"rgba(255,255,255,0.4)",cursor:"pointer",fontSize:12}}>
+        <span>{collapsed?"→":"←"}</span>
+        {!collapsed&&<span>Collapse</span>}
+      </button>
+    </div>
+  </div>
+);
+
+const Topbar = ({role,section})=>{
+  const rl={admin:"Administrator",customer:"Customer Portal",rider:"Rider Dashboard",operations:"Operations Staff"};
+  return(
+    <div style={{background:C.white,borderBottom:`2px solid ${C.g100}`,padding:"0 20px",height:58,display:"flex",alignItems:"center",justifyContent:"space-between",boxShadow:"0 2px 12px rgba(10,22,40,0.06)",position:"sticky",top:0,zIndex:5}}>
+      <div>
+        <div style={{fontSize:15,fontWeight:800,color:C.navy}}>{section}</div>
+        <div style={{fontSize:10,color:C.g400,fontWeight:600}}>{rl[role]}</div>
+      </div>
+      <div style={{display:"flex",alignItems:"center",gap:12}}>
+        <div style={{position:"relative"}}>
+          <button style={{background:C.g100,border:"none",borderRadius:9,width:36,height:36,cursor:"pointer",fontSize:15}}>🔔</button>
+          <span style={{position:"absolute",top:-3,right:-3,background:C.err,color:"#fff",borderRadius:99,width:15,height:15,fontSize:9,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center"}}>3</span>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <div style={{width:34,height:34,borderRadius:99,background:`linear-gradient(135deg,${C.blue},${C.gold})`,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:800,fontSize:12}}>AD</div>
+          <div style={{display:"none"}}>
+            <div style={{fontSize:12,fontWeight:700,color:C.navy}}>Admin User</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ADMIN DASHBOARD
+const AdminDash = ()=>{
+  const bars=[68,82,75,91,88,105,98,112,125,108,130,145];
+  const mx=Math.max(...bars);
+  const ms=["J","F","M","A","M","J","J","A","S","O","N","D"];
+  return(
+    <div>
+      <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:20}}>
+        <Stat label="Revenue" value="₦2.4M" icon="💰" color={C.gold} trend={18}/>
+        <Stat label="Active Orders" value="47" icon="📋" color={C.blue} trend={12}/>
+        <Stat label="Customers" value="284" icon="👥" color={C.ok} trend={8}/>
+        <Stat label="Deliveries" value="23" icon="🚗" color={C.info} trend={5}/>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"2fr 1fr",gap:16,marginBottom:16}}>
+        <Card>
+          <SH title="Revenue Overview" subtitle="Monthly (₦000s)"/>
+          <div style={{display:"flex",alignItems:"flex-end",gap:4,height:120}}>
+            {bars.map((v,i)=>(
+              <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
+                <div style={{width:"100%",height:`${(v/mx)*100}px`,background:i===11?`linear-gradient(180deg,${C.gold},${C.blue})`:`linear-gradient(180deg,${C.blueL}88,${C.blue}44)`,borderRadius:"3px 3px 0 0"}}/>
+                <div style={{fontSize:8,color:C.g400}}>{ms[i]}</div>
+              </div>
+            ))}
+          </div>
+        </Card>
+        <Card>
+          <SH title="Order Status"/>
+          {[{l:"Delivered",v:145,c:C.ok},{l:"Processing",v:28,c:C.blue},{l:"Pickup",v:12,c:C.warn},{l:"QC",v:7,c:C.gold}].map((x,i)=>(
+            <div key={i} style={{marginBottom:12}}>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:4}}>
+                <span style={{color:C.g600,fontWeight:600}}>{x.l}</span>
+                <span style={{color:C.navy,fontWeight:800}}>{x.v}</span>
+              </div>
+              <Progress value={x.v} max={145} color={x.c}/>
+            </div>
+          ))}
+        </Card>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+        <Card>
+          <SH title="Recent Orders"/>
+          {ORDERS.slice(0,4).map(o=>(
+            <div key={o.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"9px 0",borderBottom:`1px solid ${C.g100}`}}>
+              <div>
+                <div style={{fontSize:12,fontWeight:700,color:C.navy}}>{o.customer}</div>
+                <div style={{fontSize:10,color:C.g400}}>{o.id}</div>
+              </div>
+              <div style={{textAlign:"right"}}>
+                <StatusBadge status={o.status}/>
+                <div style={{fontSize:11,fontWeight:700,color:C.gold,marginTop:2}}>{fc(o.amount)}</div>
+              </div>
+            </div>
+          ))}
+        </Card>
+        <Card>
+          <SH title="Top Customers"/>
+          {CUSTOMERS.slice(0,4).map(c=>(
+            <div key={c.id} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 0",borderBottom:`1px solid ${C.g100}`}}>
+              <div style={{width:30,height:30,borderRadius:99,background:`linear-gradient(135deg,${C.blue},${C.gold})`,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:11,fontWeight:800,flexShrink:0}}>{av(c.name)}</div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:12,fontWeight:700,color:C.navy}}>{c.name}</div>
+                <div style={{fontSize:10,color:C.g400}}>{c.orders} orders</div>
+              </div>
+              <div style={{fontSize:12,fontWeight:800,color:C.gold}}>{fc(c.spent)}</div>
+            </div>
+          ))}
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+// ORDERS
+const Orders = ()=>{
+  const [orders,setOrders]=React.useState(ORDERS);
+  const [sel,setSel]=React.useState(null);
+  const [search,setSearch]=React.useState("");
+  const filtered=orders.filter(o=>o.customer.toLowerCase().includes(search.toLowerCase())||o.id.includes(search));
+  const nextSt={received:"pickup_scheduled",pickup_scheduled:"picked_up",picked_up:"washing",washing:"drying",drying:"ironing",ironing:"quality_check",quality_check:"ready",ready:"delivered"};
+  return(
+    <div>
+      <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:20}}>
+        <Stat label="Total" value={orders.length} icon="📋" color={C.blue}/>
+        <Stat label="Processing" value={orders.filter(o=>["washing","drying","ironing"].includes(o.status)).length} icon="⚙️" color={C.info}/>
+        <Stat label="Ready" value={orders.filter(o=>o.status==="ready").length} icon="📦" color={C.gold}/>
+        <Stat label="Delivered" value={orders.filter(o=>o.status==="delivered").length} icon="✅" color={C.ok}/>
+      </div>
+      <Card>
+        <div style={{display:"flex",gap:10,marginBottom:16}}>
+          <input placeholder="Search orders..." value={search} onChange={e=>setSearch(e.target.value)}
+            style={{flex:1,padding:"8px 12px",borderRadius:9,border:`1.5px solid ${C.g200}`,fontSize:13,outline:"none"}}/>
+          <Btn color={C.gold}>+ New Order</Btn>
+        </div>
+        <div style={{overflowX:"auto"}}>
+          <table style={{width:"100%",borderCollapse:"collapse"}}>
+            <thead>
+              <tr style={{background:C.g50}}>
+                {["ID","Customer","Weight","Status","Amount","Action"].map(h=>(
+                  <th key={h} style={{padding:"9px 12px",textAlign:"left",fontSize:10,fontWeight:700,color:C.g400,textTransform:"uppercase",letterSpacing:.8,borderBottom:`2px solid ${C.g200}`}}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(o=>(
+                <tr key={o.id} style={{borderBottom:`1px solid ${C.g100}`}}>
+                  <td style={{padding:"10px 12px",fontSize:12,fontWeight:700,color:C.blue}}>{o.id}</td>
+                  <td style={{padding:"10px 12px",fontSize:12,color:C.g800}}>
+                    <div style={{fontWeight:700}}>{o.customer}</div>
+                    <div style={{fontSize:10,color:C.g400}}>{o.phone}</div>
+                  </td>
+                  <td style={{padding:"10px 12px",fontSize:12}}>{o.weight}kg</td>
+                  <td style={{padding:"10px 12px"}}><StatusBadge status={o.status}/></td>
+                  <td style={{padding:"10px 12px",fontSize:12,fontWeight:700,color:C.gold}}>{fc(o.amount)}</td>
+                  <td style={{padding:"10px 12px"}}><Btn size="sm" outline color={C.blue} onClick={()=>setSel(o)}>Manage</Btn></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+      {sel&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}} onClick={()=>setSel(null)}>
+          <div style={{background:"#fff",borderRadius:18,padding:24,maxWidth:500,width:"90%",boxShadow:"0 24px 80px rgba(0,0,0,0.3)"}} onClick={e=>e.stopPropagation()}>
+            <div style={{display:"flex",justifyContent:"space-between",marginBottom:16}}>
+              <div>
+                <div style={{fontSize:18,fontWeight:800,color:C.navy}}>{sel.id}</div>
+                <div style={{color:C.g400,fontSize:12}}>{sel.date}</div>
+              </div>
+              <StatusBadge status={sel.status}/>
+            </div>
+            <div style={{background:C.g50,borderRadius:11,padding:14,marginBottom:16,display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+              {[["Customer",sel.customer],["Phone",sel.phone],["Weight",`${sel.weight}kg`],["Amount",fc(sel.amount)]].map(([k,v])=>(
+                <div key={k}><div style={{fontSize:9,color:C.g400,fontWeight:700,textTransform:"uppercase"}}>{k}</div><div style={{fontSize:12,fontWeight:600,color:C.navy}}>{v}</div></div>
+              ))}
+            </div>
+            <div style={{marginBottom:16}}>
+              <div style={{fontSize:11,fontWeight:700,color:C.g600,marginBottom:8,textTransform:"uppercase"}}>Update Status</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                {STATUSES.map(s=>(
+                  <button key={s.key} onClick={()=>{setOrders(p=>p.map(o=>o.id===sel.id?{...o,status:s.key}:o));setSel(p=>({...p,status:s.key}));}}
+                    style={{padding:"5px 10px",borderRadius:7,border:`2px solid ${s.color}`,background:sel.status===s.key?s.color:"transparent",color:sel.status===s.key?"#fff":s.color,fontSize:11,fontWeight:700,cursor:"pointer"}}>
+                    {s.icon} {s.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div style={{display:"flex",gap:8,justifyContent:"flex-end"}}>
+              <Btn outline color={C.g400} onClick={()=>setSel(null)}>Close</Btn>
+              <Btn color={C.gold}>🖨️ Invoice</Btn>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// CUSTOMERS
+const Customers = ()=>{
+  const [search,setSearch]=React.useState("");
+  const f=CUSTOMERS.filter(c=>c.name.toLowerCase().includes(search.toLowerCase()));
+  return(
+    <div>
+      <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:20}}>
+        <Stat label="Total" value={CUSTOMERS.length} icon="👥" color={C.blue}/>
+        <Stat label="With Plans" value={CUSTOMERS.filter(c=>c.plan).length} icon="🔄" color={C.gold}/>
+        <Stat label="Revenue" value="₦4.09M" icon="💰" color={C.ok}/>
+      </div>
+      <Card>
+        <div style={{display:"flex",gap:10,marginBottom:16}}>
+          <input placeholder="Search..." value={search} onChange={e=>setSearch(e.target.value)}
+            style={{flex:1,padding:"8px 12px",borderRadius:9,border:`1.5px solid ${C.g200}`,fontSize:13,outline:"none"}}/>
+          <Btn color={C.gold}>+ Add</Btn>
+        </div>
+        {f.map(c=>(
+          <div key={c.id} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:`1px solid ${C.g100}`}}>
+            <div style={{width:38,height:38,borderRadius:99,background:`linear-gradient(135deg,${C.blue},${C.gold})`,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:13,fontWeight:800,flexShrink:0}}>{av(c.name)}</div>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:700,color:C.navy,fontSize:13}}>{c.name}</div>
+              <div style={{fontSize:11,color:C.g400}}>{c.email} · {c.orders} orders</div>
+            </div>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontSize:13,fontWeight:800,color:C.gold}}>{fc(c.spent)}</div>
+              {c.plan?<Badge color={C.blue}>{c.plan}</Badge>:<Badge color={C.g400}>No Plan</Badge>}
+            </div>
+          </div>
+        ))}
+      </Card>
+    </div>
+  );
+};
+
+// SERVICES
+const Services = ()=>{
+  const [svcs,setSvcs]=React.useState(SERVICES);
+  const [editing,setEditing]=React.useState(null);
+  const [ep,setEp]=React.useState("");
+  return(
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+      <Card>
+        <SH title="Service Pricing" action={<Btn size="sm" color={C.gold}>+ Add</Btn>}/>
+        {svcs.map(s=>(
+          <div key={s.id} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:`1px solid ${C.g100}`}}>
+            <span style={{fontSize:22}}>{s.icon}</span>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:700,color:C.navy,fontSize:13}}>{s.name}</div>
+              <div style={{fontSize:11,color:C.g400}}>{s.unit}</div>
+            </div>
+            {editing===s.id?(
+              <div style={{display:"flex",gap:6}}>
+                <input value={ep} onChange={e=>setEp(e.target.value)} style={{width:80,padding:"5px 8px",borderRadius:7,border:`1.5px solid ${C.blue}`,fontSize:13}}/>
+                <Btn size="sm" color={C.ok} onClick={()=>{setSvcs(p=>p.map(x=>x.id===s.id?{...x,price:Number(ep)}:x));setEditing(null);}}>✓</Btn>
+              </div>
+            ):(
+              <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                <span style={{fontWeight:800,color:C.gold,fontSize:13}}>{fc(s.price)}</span>
+                <Btn size="sm" outline color={C.blue} onClick={()=>{setEditing(s.id);setEp(s.price);}}>Edit</Btn>
+              </div>
+            )}
+          </div>
+        ))}
+      </Card>
+      <div>
+        <Card>
+          <SH title="Subscription Plans"/>
+          {PLANS.map(p=>(
+            <div key={p.id} style={{background:`${p.color}10`,border:`1.5px solid ${p.color}33`,borderRadius:12,padding:14,marginBottom:10}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div>
+                  <div style={{fontWeight:800,color:p.color}}>{p.name} {p.popular?"⭐":""}</div>
+                  <div style={{fontSize:12,color:C.g600}}>{p.kg}kg/month</div>
+                </div>
+                <div style={{fontWeight:900,color:p.color,fontSize:18}}>{fc(p.price)}</div>
+              </div>
+            </div>
+          ))}
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+// INVENTORY
+const Inventory = ()=>{
+  const low=INVENTORY.filter(i=>i.stock<=i.min);
+  return(
+    <div>
+      <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:20}}>
+        <Stat label="Items" value={INVENTORY.length} icon="📦" color={C.blue}/>
+        <Stat label="Low Stock" value={low.length} icon="⚠️" color={C.err}/>
+        <Stat label="Est. Value" value="₦124K" icon="💰" color={C.ok}/>
+      </div>
+      {low.length>0&&(
+        <div style={{background:C.err+"12",border:`2px solid ${C.err}33`,borderRadius:12,padding:14,marginBottom:16}}>
+          <div style={{fontWeight:800,color:C.err,marginBottom:8}}>⚠️ Low Stock Alert</div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+            {low.map(i=><Badge key={i.id} color={C.err}>{i.name}: {i.stock} left</Badge>)}
+          </div>
+        </div>
+      )}
+      <Card>
+        <SH title="Inventory" action={<Btn size="sm" color={C.gold}>+ Add Item</Btn>}/>
+        {INVENTORY.map(item=>(
+          <div key={item.id} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:`1px solid ${C.g100}`}}>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:700,color:C.navy,fontSize:13}}>{item.name}</div>
+              <div style={{fontSize:11,color:C.g400}}>{item.cat}</div>
+            </div>
+            <div style={{minWidth:100}}>
+              <div style={{fontSize:12,fontWeight:700,color:item.stock<=item.min?C.err:C.ok}}>{item.stock} {item.unit}</div>
+              <Progress value={item.stock} max={item.min*4} color={item.stock<=item.min?C.err:C.ok}/>
+            </div>
+            {item.stock<=item.min?<Badge color={C.err}>⚠️ Low</Badge>:<Badge color={C.ok}>✓ OK</Badge>}
+          </div>
+        ))}
+      </Card>
+    </div>
+  );
+};
+
+// POS
+const POS = ()=>{
+  const [cart,setCart]=React.useState([]);
+  const [pay,setPay]=React.useState("cash");
+  const [done,setDone]=React.useState(false);
+  const add=s=>setCart(p=>{const e=p.find(i=>i.id===s.id);return e?p.map(i=>i.id===s.id?{...i,qty:i.qty+1}:i):[...p,{...s,qty:1}];});
+  const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const tax=Math.round(total*.075);
+  if(done) return(
+    <Card style={{textAlign:"center",padding:40}}>
+      <div style={{fontSize:50,marginBottom:16}}>✅</div>
+      <div style={{fontSize:20,fontWeight:900,color:C.ok,marginBottom:8}}>Payment Successful!</div>
+      <div style={{color:C.g400,marginBottom:16}}>DBL-{Math.floor(Math.random()*9000+1000)}</div>
+      <div style={{fontWeight:900,color:C.gold,fontSize:22,marginBottom:20}}>{fc(total+tax)} via {pay.toUpperCase()}</div>
+      <Btn color={C.blue} onClick={()=>{setCart([]);setDone(false);}}>New Transaction</Btn>
+    </Card>
+  );
+  return(
+    <div style={{display:"grid",gridTemplateColumns:"1fr 340px",gap:16}}>
+      <Card>
+        <SH title="Services Menu"/>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:10}}>
+          {SERVICES.map(s=>(
+            <button key={s.id} onClick={()=>add(s)}
+              style={{padding:14,borderRadius:12,border:`2px solid ${C.g200}`,background:C.white,cursor:"pointer",textAlign:"left",transition:"all 0.15s"}}>
+              <div style={{fontSize:26,marginBottom:6}}>{s.icon}</div>
+              <div style={{fontWeight:700,fontSize:12,color:C.navy}}>{s.name}</div>
+              <div style={{fontSize:10,color:C.g400,marginBottom:4}}>{s.unit}</div>
+              <div style={{fontWeight:800,color:C.gold,fontSize:13}}>{fc(s.price)}</div>
+            </button>
+          ))}
+        </div>
+      </Card>
+      <Card>
+        <SH title="🛒 Cart"/>
+        {cart.length===0?(
+          <div style={{textAlign:"center",padding:"28px 0",color:C.g400}}>
+            <div style={{fontSize:32,marginBottom:8}}>🛒</div>
+            <div style={{fontSize:13}}>Add services from menu</div>
+          </div>
+        ):(
+          <>
+            {cart.map(i=>(
+              <div key={i.id} style={{display:"flex",alignItems:"center",gap:8,padding:"9px 0",borderBottom:`1px solid ${C.g100}`}}>
+                <span style={{fontSize:18}}>{i.icon}</span>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:700,fontSize:12}}>{i.name}</div>
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:6}}>
+                  <button onClick={()=>i.qty>1?setCart(p=>p.map(x=>x.id===i.id?{...x,qty:x.qty-1}:x)):setCart(p=>p.filter(x=>x.id!==i.id))}
+                    style={{width:22,height:22,borderRadius:5,border:`1px solid ${C.g200}`,background:"transparent",cursor:"pointer"}}>-</button>
+                  <span style={{fontWeight:700,fontSize:12,minWidth:14,textAlign:"center"}}>{i.qty}</span>
+                  <button onClick={()=>add(i)} style={{width:22,height:22,borderRadius:5,border:`1px solid ${C.blue}`,background:C.blue,color:"#fff",cursor:"pointer"}}>+</button>
+                </div>
+                <span style={{fontWeight:800,color:C.gold,fontSize:12}}>{fc(i.price*i.qty)}</span>
+              </div>
+            ))}
+            <div style={{background:C.g50,borderRadius:10,padding:12,margin:"14px 0"}}>
+              {[["Subtotal",fc(total)],["VAT 7.5%",fc(tax)],["Total",fc(total+tax)]].map(([k,v],i)=>(
+                <div key={k} style={{display:"flex",justifyContent:"space-between",marginBottom:i<2?5:0,fontWeight:i===2?800:600,fontSize:i===2?15:12,color:i===2?C.gold:C.g600,paddingTop:i===2?8:0,borderTop:i===2?`2px solid ${C.g200}`:"none",marginTop:i===2?8:0}}>
+                  <span>{k}</span><span>{v}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:12}}>
+              {["cash","transfer","card","mobile"].map(m=>(
+                <button key={m} onClick={()=>setPay(m)}
+                  style={{padding:"8px",borderRadius:8,border:`2px solid ${pay===m?C.gold:C.g200}`,background:pay===m?C.gold+"15":"transparent",fontWeight:700,fontSize:12,color:pay===m?C.gold:C.g600,cursor:"pointer",textTransform:"capitalize"}}>
+                  {m==="cash"?"💵":m==="transfer"?"🏦":m==="card"?"💳":"📱"} {m}
+                </button>
+              ))}
+            </div>
+            <Btn color={C.gold} onClick={()=>setDone(true)} style={{width:"100%"}} size="lg">💳 Checkout {fc(total+tax)}</Btn>
+          </>
+        )}
+      </Card>
+    </div>
+  );
+};
+
+// REPORTS
+const Reports = ()=>(
+  <div>
+    <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:20}}>
+      <Stat label="Revenue" value="₦2.4M" icon="💰" color={C.gold} trend={18}/>
+      <Stat label="Expenses" value="₦680K" icon="📤" color={C.err}/>
+      <Stat label="Net Profit" value="₦1.72M" icon="📊" color={C.ok} trend={22}/>
+      <Stat label="Orders" value="184" icon="📋" color={C.blue}/>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+      <Card>
+        <SH title="Revenue Split by Service"/>
+        {[{n:"Wash & Fold",p:38,c:C.blue},{n:"Wash & Iron",p:28,c:C.gold},{n:"Dry Cleaning",p:18,c:C.navy},{n:"Others",p:16,c:C.g400}].map(s=>(
+          <div key={s.n} style={{marginBottom:12}}>
+            <div style={{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:4}}>
+              <span style={{fontWeight:600,color:C.g600}}>{s.n}</span>
+              <span style={{fontWeight:800,color:s.c}}>{s.p}%</span>
+            </div>
+            <Progress value={s.p} max={100} color={s.c}/>
+          </div>
+        ))}
+        <div style={{display:"flex",gap:8,marginTop:16}}>
+          <Btn color={C.gold} style={{flex:1}}>📄 PDF</Btn>
+          <Btn color={C.ok} style={{flex:1}}>📊 Excel</Btn>
+        </div>
+      </Card>
+      <Card>
+        <SH title="Monthly Performance"/>
+        <div style={{display:"flex",alignItems:"flex-end",gap:8,height:140}}>
+          {[180,210,195,240,220,275].map((v,i)=>(
+            <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
+              <div style={{width:"100%",height:`${(v/275)*120}px`,background:`linear-gradient(180deg,${C.gold},${C.blue})`,borderRadius:"3px 3px 0 0"}}/>
+              <div style={{fontSize:9,color:C.g400}}>{"JFMAMJ"[i]}</div>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
+  </div>
+);
+
+// RIDERS
+const Riders = ()=>(
+  <div>
+    <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:20}}>
+      <Stat label="Active Riders" value="2" icon="🚗" color={C.blue}/>
+      <Stat label="Pickups Today" value="7" icon="📦" color={C.gold}/>
+      <Stat label="Deliveries" value="11" icon="🏠" color={C.ok}/>
+    </div>
+    <Card>
+      <SH title="Rider Status" action={<Btn size="sm" color={C.gold}>+ Add Rider</Btn>}/>
+      {[{n:"Tunde Balogun",p:"0812 000 1111",st:"active",pk:3,dl:2,r:4.8},{n:"Seun Adeyemi",p:"0901 222 3333",st:"active",pk:1,dl:4,r:4.9},{n:"Kola Olatunji",p:"0703 444 5555",st:"offline",pk:0,dl:0,r:4.7}].map((r,i)=>(
+        <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"13px 0",borderBottom:`1px solid ${C.g100}`}}>
+          <div style={{position:"relative"}}>
+            <div style={{width:38,height:38,borderRadius:99,background:`linear-gradient(135deg,${C.navy},${C.blue})`,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:800,fontSize:13}}>{av(r.n)}</div>
+            <div style={{position:"absolute",bottom:0,right:0,width:10,height:10,borderRadius:99,background:r.st==="active"?C.ok:C.g400,border:"2px solid white"}}/>
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontWeight:700,color:C.navy,fontSize:13}}>{r.n}</div>
+            <div style={{fontSize:11,color:C.g400}}>{r.p}</div>
+          </div>
+          <div style={{textAlign:"right"}}>
+            <div style={{fontSize:11,color:C.g600}}>📦{r.pk} · 🚗{r.dl}</div>
+            <div style={{fontSize:12,fontWeight:700,color:C.warn}}>⭐{r.r}</div>
+          </div>
+        </div>
+      ))}
+    </Card>
+  </div>
+);
+
+// SUBSCRIPTIONS
+const Subscriptions = ()=>(
+  <div>
+    <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:20}}>
+      <Stat label="Active Subs" value="47" icon="🔄" color={C.blue}/>
+      <Stat label="Monthly Rev" value="₦1.89M" icon="💰" color={C.gold}/>
+      <Stat label="Expiring Soon" value="8" icon="⏳" color={C.warn}/>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14,marginBottom:20}}>
+      {PLANS.map(p=>(
+        <Card key={p.id} style={{textAlign:"center",border:p.popular?`2px solid ${C.gold}`:undefined,position:"relative"}}>
+          {p.popular&&<div style={{background:`linear-gradient(90deg,${C.gold},${C.goldL})`,color:"#fff",borderRadius:99,padding:"2px 12px",fontSize:10,fontWeight:800,marginBottom:8,display:"inline-block"}}>Popular</div>}
+          <div style={{fontSize:28,margin:"8px 0"}}>{p.id==="basic"?"🌱":p.id==="standard"?"⭐":"👑"}</div>
+          <div style={{fontWeight:800,color:p.color}}>{p.name}</div>
+          <div style={{fontWeight:900,color:C.navy,fontSize:20,margin:"8px 0"}}>{fc(p.price)}</div>
+          <div style={{fontSize:12,color:C.g400,marginBottom:12}}>{p.kg}kg/month</div>
+          <Btn color={p.color} style={{width:"100%"}} size="sm">Manage</Btn>
+        </Card>
+      ))}
+    </div>
+    <Card>
+      <SH title="Active Subscribers"/>
+      {CUSTOMERS.filter(c=>c.plan).map(c=>{
+        const p=PLANS.find(x=>x.name===c.plan);
+        const used=Math.floor(Math.random()*(p?.kg||25));
+        return(
+          <div key={c.id} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:`1px solid ${C.g100}`}}>
+            <div style={{width:34,height:34,borderRadius:99,background:`linear-gradient(135deg,${C.blue},${C.gold})`,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:12,fontWeight:800}}>{av(c.name)}</div>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:700,color:C.navy,fontSize:13}}>{c.name}</div>
+              <div style={{fontSize:11,color:C.g400}}>Used {used}kg of {p?.kg}kg</div>
+              <Progress value={used} max={p?.kg||25} color={C.gold}/>
+            </div>
+            <Badge color={p?.color||C.blue}>{c.plan}</Badge>
+          </div>
+        );
+      })}
+    </Card>
+  </div>
+);
+
+// NOTIFICATIONS
+const Notifications = ()=>{
+  const [msg,setMsg]=React.useState("");
+  const templates=[
+    {icon:"📋",label:"Order Received",text:"Hi {name}, your order #{id} has been received!"},
+    {icon:"🚗",label:"Pickup Scheduled",text:"Hi {name}, your pickup is scheduled for today 2PM–5PM."},
+    {icon:"📦",label:"Ready for Delivery",text:"Hi {name}, your laundry is ready for delivery!"},
+    {icon:"🔄",label:"Sub Expiry",text:"Hi {name}, your subscription expires in 3 days. Renew now!"},
+  ];
+  return(
+    <div style={{display:"grid",gridTemplateColumns:"1fr 300px",gap:16}}>
+      <Card>
+        <SH title="Compose Notification"/>
+        <div style={{marginBottom:16}}>
+          <div style={{fontSize:11,fontWeight:700,color:C.g600,marginBottom:8,textTransform:"uppercase"}}>Quick Templates</div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+            {templates.map(t=>(
+              <button key={t.label} onClick={()=>setMsg(t.text)}
+                style={{padding:"7px 12px",borderRadius:8,border:`1.5px solid ${C.g200}`,background:C.white,cursor:"pointer",fontSize:12,fontWeight:600,color:C.navy}}>
+                {t.icon} {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div style={{marginBottom:14}}>
+          <div style={{fontSize:11,fontWeight:700,color:C.g600,marginBottom:6,textTransform:"uppercase"}}>Message</div>
+          <textarea value={msg} onChange={e=>setMsg(e.target.value)} rows={4} placeholder="Type your message..."
+            style={{width:"100%",padding:"10px 12px",borderRadius:9,border:`1.5px solid ${C.g200}`,fontSize:13,resize:"vertical",outline:"none",boxSizing:"border-box"}}/>
+        </div>
+        <div style={{display:"flex",gap:10}}>
+          <Btn color={C.gold} style={{flex:1}}>📤 Send Now</Btn>
+          <Btn color={C.blue} outline>⏱️ Schedule</Btn>
+        </div>
+      </Card>
+      <Card>
+        <SH title="Auto-Triggers"/>
+        {["Order Created","Pickup Assigned","Status Changed","Ready for Delivery","Sub Expiry (3d)"].map((t,i)=>(
+          <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 0",borderBottom:`1px solid ${C.g100}`}}>
+            <span style={{fontSize:12,color:C.g600}}>{t}</span>
+            <div style={{width:34,height:18,borderRadius:99,background:C.ok,position:"relative",cursor:"pointer"}}>
+              <div style={{position:"absolute",top:2,right:2,width:14,height:14,borderRadius:99,background:"#fff",boxShadow:"0 1px 3px rgba(0,0,0,0.2)"}}/>
+            </div>
+          </div>
+        ))}
+      </Card>
+    </div>
+  );
+};
+
+// STAFF
+const Staff = ()=>(
+  <div>
+    <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:20}}>
+      <Stat label="Total Staff" value="12" icon="👤" color={C.blue}/>
+      <Stat label="Active" value="9" icon="✅" color={C.ok}/>
+      <Stat label="Riders" value="3" icon="🚗" color={C.gold}/>
+    </div>
+    <Card>
+      <SH title="Staff Accounts" action={<Btn size="sm" color={C.gold}>+ Add Staff</Btn>}/>
+      {[
+        {n:"Ade Johnson",role:"Admin",email:"ade@dblessed.ng",st:"Active"},
+        {n:"Tunde Balogun",role:"Rider",email:"tunde@dblessed.ng",st:"Active"},
+        {n:"Seun Adeyemi",role:"Rider",email:"seun@dblessed.ng",st:"Active"},
+        {n:"Ngozi Williams",role:"Operations",email:"ngozi@dblessed.ng",st:"Active"},
+        {n:"Emeka Peters",role:"Operations",email:"emeka@dblessed.ng",st:"On Leave"},
+      ].map((s,i)=>(
+        <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:`1px solid ${C.g100}`}}>
+          <div style={{width:36,height:36,borderRadius:99,background:`linear-gradient(135deg,${C.navy},${C.blue})`,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:12,fontWeight:800}}>{av(s.n)}</div>
+          <div style={{flex:1}}>
+            <div style={{fontWeight:700,color:C.navy,fontSize:13}}>{s.n}</div>
+            <div style={{fontSize:11,color:C.g400}}>{s.email}</div>
+          </div>
+          <Badge color={s.role==="Admin"?C.blue:s.role==="Rider"?C.gold:C.info}>{s.role}</Badge>
+          <Badge color={s.st==="Active"?C.ok:C.warn}>{s.st}</Badge>
+          <Btn size="sm" outline color={C.blue}>Edit</Btn>
+        </div>
+      ))}
+    </Card>
+  </div>
+);
+
+// CUSTOMER PORTAL SCREENS
+const CustHome = ({setActive})=>(
+  <div>
+    <div style={{background:`linear-gradient(135deg,${C.navy},${C.blue})`,borderRadius:18,padding:"22px 22px 80px",color:"#fff",marginBottom:-60,position:"relative",overflow:"hidden"}}>
+      <div style={{position:"absolute",right:20,top:10,fontSize:70,opacity:0.08}}>👕</div>
+      <div style={{fontSize:12,color:"rgba(255,255,255,0.6)",marginBottom:3}}>Welcome back,</div>
+      <div style={{fontSize:20,fontWeight:900,marginBottom:10}}>Adaeze Okonkwo 👋</div>
+      <div style={{display:"flex",gap:20}}>
+        <div><div style={{fontSize:18,fontWeight:900,color:C.goldL}}>⭐ 875</div><div style={{fontSize:10,color:"rgba(255,255,255,0.5)"}}>Points</div></div>
+        <div><div style={{fontSize:18,fontWeight:900,color:C.goldL}}>12</div><div style={{fontSize:10,color:"rgba(255,255,255,0.5)"}}>Orders</div></div>
+        <div><div style={{fontSize:18,fontWeight:900,color:C.goldL}}>Standard</div><div style={{fontSize:10,color:"rgba(255,255,255,0.5)"}}>Plan</div></div>
+      </div>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))",gap:10,position:"relative",zIndex:1,marginBottom:16}}>
+      {[{icon:"➕",label:"New Order",a:"place_order",c:C.gold},{icon:"📍",label:"Track Order",a:"track",c:C.blue},{icon:"🔄",label:"My Plan",a:"myplan",c:C.navy},{icon:"⭐",label:"Rewards",a:"loyalty",c:C.warn},{icon:"💰",label:"Pricing",a:"pricing",c:C.ok},{icon:"🎁",label:"Refer & Earn",a:"referral",c:C.info}].map(q=>(
+        <button key={q.a} onClick={()=>setActive(q.a)}
+          style={{padding:"16px 12px",borderRadius:14,background:"#fff",border:`2px solid ${q.c}22`,cursor:"pointer",boxShadow:"0 4px 14px rgba(10,22,40,0.08)",display:"flex",flexDirection:"column",alignItems:"center",gap:6}}>
+          <div style={{width:40,height:40,borderRadius:10,background:q.c+"18",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20}}>{q.icon}</div>
+          <div style={{fontWeight:700,fontSize:12,color:C.navy}}>{q.label}</div>
+        </button>
+      ))}
+    </div>
+    <Card>
+      <SH title="Active Orders"/>
+      {ORDERS.slice(0,3).map(o=>(
+        <div key={o.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0",borderBottom:`1px solid ${C.g100}`}}>
+          <div>
+            <div style={{fontWeight:700,color:C.navy,fontSize:12}}>{o.id}</div>
+            <div style={{fontSize:10,color:C.g400}}>{o.services.join(", ")}</div>
+          </div>
+          <div style={{textAlign:"right"}}>
+            <StatusBadge status={o.status}/>
+            <div style={{fontSize:11,fontWeight:700,color:C.gold,marginTop:2}}>{fc(o.amount)}</div>
+          </div>
+        </div>
+      ))}
+    </Card>
+  </div>
+);
+
+const PlaceOrder = ()=>{
+  const [step,setStep]=React.useState(1);
+  const [sel,setSel]=React.useState([]);
+  const [addr,setAddr]=React.useState("12 Banana Island, Lagos");
+  const [done,setDone]=React.useState(false);
+  const toggle=id=>setSel(p=>p.includes(id)?p.filter(i=>i!==id):[...p,id]);
+  const selSvcs=SERVICES.filter(s=>sel.includes(s.id));
+  const total=selSvcs.reduce((s,x)=>s+x.price,0);
+  if(done) return(
+    <Card style={{textAlign:"center",padding:36}}>
+      <div style={{fontSize:50,marginBottom:14}}>🎉</div>
+      <div style={{fontSize:20,fontWeight:900,color:C.navy,marginBottom:6}}>Order Placed!</div>
+      <div style={{fontSize:26,fontWeight:900,color:C.gold,marginBottom:14}}>DBL-{Math.floor(Math.random()*9000+1000)}</div>
+      <div style={{color:C.g400,marginBottom:20}}>You'll get SMS & WhatsApp updates</div>
+      <Btn color={C.blue} onClick={()=>{setDone(false);setStep(1);setSel([]);}}>New Order</Btn>
+    </Card>
+  );
+  return(
+    <div>
+      <div style={{display:"flex",gap:0,marginBottom:20}}>
+        {["Services","Schedule","Confirm"].map((s,i)=>(
+          <div key={s} style={{flex:1,display:"flex",alignItems:"center"}}>
+            <div style={{display:"flex",alignItems:"center",gap:6}}>
+              <div style={{width:26,height:26,borderRadius:99,background:step>i+1?C.ok:step===i+1?C.gold:C.g200,color:step>=i+1?"#fff":C.g400,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:800}}>
+                {step>i+1?"✓":i+1}
+              </div>
+              <span style={{fontSize:12,fontWeight:step===i+1?800:500,color:step===i+1?C.navy:C.g400}}>{s}</span>
+            </div>
+            {i<2&&<div style={{flex:1,height:2,background:step>i+1?C.ok:C.g200,margin:"0 6px"}}/>}
+          </div>
+        ))}
+      </div>
+      {step===1&&(
+        <div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(150px,1fr))",gap:10,marginBottom:20}}>
+            {SERVICES.map(s=>(
+              <button key={s.id} onClick={()=>toggle(s.id)}
+                style={{padding:14,borderRadius:12,border:`2px solid ${sel.includes(s.id)?C.gold:C.g200}`,background:sel.includes(s.id)?C.gold+"10":"#fff",cursor:"pointer",textAlign:"left"}}>
+                <div style={{fontSize:24,marginBottom:6}}>{s.icon}</div>
+                <div style={{fontWeight:700,fontSize:12,color:C.navy}}>{s.name}</div>
+                <div style={{fontWeight:800,color:C.gold,marginTop:4}}>{fc(s.price)}</div>
+                {sel.includes(s.id)&&<div style={{color:C.ok,fontSize:10,fontWeight:700,marginTop:3}}>✓ Selected</div>}
+              </button>
+            ))}
+          </div>
+          <Btn color={C.gold} onClick={()=>setStep(2)} disabled={sel.length===0} size="lg" style={{width:"100%"}}>Continue ({sel.length} selected)</Btn>
+        </div>
+      )}
+      {step===2&&(
+        <Card>
+          <div style={{marginBottom:14}}>
+            <div style={{fontSize:11,fontWeight:700,color:C.g600,marginBottom:6,textTransform:"uppercase"}}>Pickup Address</div>
+            <input value={addr} onChange={e=>setAddr(e.target.value)} style={{width:"100%",padding:"10px 12px",borderRadius:9,border:`1.5px solid ${C.g200}`,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
+          </div>
+          <div style={{display:"flex",gap:10}}>
+            <Btn outline color={C.g400} onClick={()=>setStep(1)}>← Back</Btn>
+            <Btn color={C.gold} onClick={()=>setStep(3)} size="lg" style={{flex:1}}>Review →</Btn>
+          </div>
+        </Card>
+      )}
+      {step===3&&(
+        <Card>
+          <div style={{fontWeight:800,color:C.navy,fontSize:16,marginBottom:16}}>Confirm Order</div>
+          <div style={{background:C.g50,borderRadius:11,padding:14,marginBottom:16}}>
+            {selSvcs.map(s=>(
+              <div key={s.id} style={{display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:`1px solid ${C.g100}`,fontSize:13}}>
+                <span>{s.icon} {s.name}</span><span style={{fontWeight:700}}>{fc(s.price)}</span>
+              </div>
+            ))}
+            <div style={{display:"flex",justifyContent:"space-between",padding:"10px 0 0",fontWeight:800,fontSize:15}}>
+              <span>Est. Total</span><span style={{color:C.gold}}>{fc(total)}</span>
+            </div>
+          </div>
+          <div style={{fontSize:13,color:C.g600,marginBottom:16}}>📍 {addr}</div>
+          <div style={{display:"flex",gap:10}}>
+            <Btn outline color={C.g400} onClick={()=>setStep(2)}>← Back</Btn>
+            <Btn color={C.gold} onClick={()=>setDone(true)} size="lg" style={{flex:1}}>✓ Place Order</Btn>
+          </div>
+        </Card>
+      )}
+    </div>
+  );
+};
+
+const TrackOrder = ()=>{
+  const [id,setId]=React.useState("DBL-001");
+  const [tracked,setTracked]=React.useState(null);
+  const find=()=>setTracked(ORDERS.find(o=>o.id===id)||false);
+  const idx=tracked?STATUSES.findIndex(s=>s.key===tracked.status):-1;
+  return(
+    <div>
+      <Card style={{marginBottom:16}}>
+        <div style={{display:"flex",gap:10}}>
+          <input value={id} onChange={e=>setId(e.target.value)} placeholder="Enter Order ID" style={{flex:1,padding:"10px 12px",borderRadius:9,border:`1.5px solid ${C.g200}`,fontSize:13,outline:"none"}}/>
+          <Btn color={C.gold} onClick={find}>Track</Btn>
+        </div>
+      </Card>
+      {tracked===false&&<Card style={{textAlign:"center",padding:32}}><div style={{fontSize:36}}>🔍</div><div style={{color:C.g400,marginTop:8}}>Order not found</div></Card>}
+      {tracked&&(
+        <Card>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:20}}>
+            <div><div style={{fontWeight:800,color:C.navy,fontSize:16}}>{tracked.id}</div><div style={{color:C.g400,fontSize:12}}>{tracked.services.join(", ")}</div></div>
+            <div style={{fontWeight:800,color:C.gold,fontSize:16}}>{fc(tracked.amount)}</div>
+          </div>
+          {STATUSES.map((s,i)=>(
+            <div key={s.key} style={{display:"flex",gap:14}}>
+              <div style={{display:"flex",flexDirection:"column",alignItems:"center",width:30}}>
+                <div style={{width:30,height:30,borderRadius:99,background:i<idx?C.ok:i===idx?s.color:C.g200,display:"flex",alignItems:"center",justifyContent:"center",fontSize:i<=idx?13:11,border:i===idx?`3px solid ${s.color}`:"none",boxShadow:i===idx?`0 0 0 4px ${s.color}22`:"none"}}>
+                  {i<idx?"✓":s.icon}
+                </div>
+                {i<STATUSES.length-1&&<div style={{width:2,flex:1,minHeight:20,background:i<idx?C.ok:C.g200}}/>}
+              </div>
+              <div style={{padding:"3px 0 18px"}}>
+                <div style={{fontWeight:i<=idx?700:500,color:i<=idx?C.navy:C.g400,fontSize:13}}>{s.label}</div>
+                {i===idx&&<div style={{fontSize:11,color:s.color,fontWeight:600}}>Current Status</div>}
+              </div>
+            </div>
+          ))}
+        </Card>
+      )}
+    </div>
+  );
+};
+
+const Loyalty = ()=>(
+  <div>
+    <Card style={{background:`linear-gradient(135deg,${C.gold},#C9962C)`,marginBottom:16}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div>
+          <div style={{color:"rgba(255,255,255,0.7)",fontSize:12}}>Points Balance</div>
+          <div style={{fontWeight:900,color:"#fff",fontSize:38}}>⭐ 875</div>
+          <div style={{color:"rgba(255,255,255,0.7)",fontSize:12}}>{fc(875*10)} in rewards</div>
+        </div>
+        <div><Badge color="#fff">Gold Member</Badge></div>
+      </div>
+    </Card>
+    <Card style={{marginBottom:16}}>
+      <SH title="Redeem Points"/>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+        {[{pts:200,r:"Free Wash & Fold 2kg",i:"🎁"},{pts:500,r:"₦5,000 Voucher",i:"💵"},{pts:800,r:"Free Dry Cleaning",i:"🧥"},{pts:1000,r:"1 Month Free Delivery",i:"🚗"}].map(x=>(
+          <div key={x.pts} style={{background:C.g50,borderRadius:12,padding:14}}>
+            <div style={{fontSize:26,marginBottom:6}}>{x.i}</div>
+            <div style={{fontWeight:700,color:C.navy,fontSize:12,marginBottom:4}}>{x.r}</div>
+            <div style={{fontWeight:800,color:C.gold,marginBottom:8}}>⭐ {x.pts}</div>
+            <Btn size="sm" color={875>=x.pts?C.gold:C.g400} disabled={875<x.pts} style={{width:"100%"}}>Redeem</Btn>
+          </div>
+        ))}
+      </div>
+    </Card>
+  </div>
+);
+
+const Referral = ()=>(
+  <div>
+    <Card style={{background:`linear-gradient(135deg,${C.navy},${C.blue})`,marginBottom:16}}>
+      <div style={{color:"rgba(255,255,255,0.7)",fontSize:12,marginBottom:6}}>Your Referral Code</div>
+      <div style={{fontWeight:900,color:C.goldL,fontSize:30,letterSpacing:4}}>ADAEZE200</div>
+      <div style={{color:"rgba(255,255,255,0.6)",fontSize:12,marginTop:8}}>Friends get ₦2,000 off · You earn 200 points!</div>
+      <Btn color={C.gold} style={{marginTop:14}}>📋 Copy Code</Btn>
+    </Card>
+    <div style={{display:"flex",gap:12,marginBottom:16}}>
+      <Stat label="Referred" value="5" icon="👥" color={C.blue}/>
+      <Stat label="Points Earned" value="1,000" icon="⭐" color={C.gold}/>
+    </div>
+    <Card>
+      <SH title="Share Via"/>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
+        {[{i:"💬",l:"WhatsApp"},{i:"📱",l:"SMS"},{i:"📧",l:"Email"},{i:"🔗",l:"Link"}].map(s=>(
+          <button key={s.l} style={{padding:"12px 6px",borderRadius:10,border:`2px solid ${C.g200}`,background:"#fff",cursor:"pointer"}}>
+            <div style={{fontSize:22,marginBottom:3}}>{s.i}</div>
+            <div style={{fontSize:11,fontWeight:700,color:C.navy}}>{s.l}</div>
+          </button>
+        ))}
+      </div>
+    </Card>
+  </div>
+);
+
+const MyPlan = ()=>{
+  const p=PLANS[1];
+  return(
+    <div>
+      <Card style={{background:`linear-gradient(135deg,${C.navy},${C.blue})`,marginBottom:16}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div>
+            <div style={{color:"rgba(255,255,255,0.6)",fontSize:12}}>Current Plan</div>
+            <div style={{fontWeight:900,color:C.goldL,fontSize:22}}>⭐ Standard Plan</div>
+            <div style={{color:"rgba(255,255,255,0.6)",fontSize:12,marginTop:4}}>Renews July 1, 2024</div>
+          </div>
+          <div style={{textAlign:"right"}}>
+            <div style={{fontWeight:900,color:C.goldL,fontSize:26}}>{fc(p.price)}</div>
+            <div style={{color:"rgba(255,255,255,0.5)",fontSize:11}}>/month</div>
+          </div>
+        </div>
+      </Card>
+      <Card style={{marginBottom:16}}>
+        <div style={{fontWeight:700,color:C.navy,marginBottom:12}}>Usage This Month</div>
+        <div style={{display:"flex",justifyContent:"space-between",marginBottom:6,fontSize:13}}>
+          <span style={{color:C.g600}}>Kilograms Used</span>
+          <span style={{fontWeight:800,color:C.navy}}>31 / 50 kg</span>
+        </div>
+        <Progress value={31} max={50} color={C.gold}/>
+        <div style={{display:"flex",justifyContent:"space-between",marginTop:6,fontSize:11,color:C.g400}}>
+          <span>19 kg remaining</span><span>62% used</span>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+// RIDER PORTAL
+const RiderHome = ()=>(
+  <div>
+    <div style={{background:`linear-gradient(135deg,${C.navy},${C.blue})`,borderRadius:18,padding:20,color:"#fff",marginBottom:16}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div>
+          <div style={{fontSize:12,color:"rgba(255,255,255,0.6)"}}>Good morning,</div>
+          <div style={{fontSize:20,fontWeight:900}}>Tunde Balogun 🚗</div>
+        </div>
+        <div style={{background:C.ok,borderRadius:8,padding:"5px 12px",fontSize:11,fontWeight:800}}>● Online</div>
+      </div>
+      <div style={{display:"flex",gap:20,marginTop:14}}>
+        <div><div style={{fontWeight:900,fontSize:20,color:C.goldL}}>3</div><div style={{fontSize:10,color:"rgba(255,255,255,0.5)"}}>Pickups</div></div>
+        <div><div style={{fontWeight:900,fontSize:20,color:C.goldL}}>2</div><div style={{fontSize:10,color:"rgba(255,255,255,0.5)"}}>Deliveries</div></div>
+        <div><div style={{fontWeight:900,fontSize:20,color:C.goldL}}>⭐4.8</div><div style={{fontSize:10,color:"rgba(255,255,255,0.5)"}}>Rating</div></div>
+      </div>
+    </div>
+    <div style={{fontWeight:800,color:C.navy,marginBottom:12}}>Assigned Tasks</div>
+    {ORDERS.filter(o=>["pickup_scheduled","picked_up","ready"].includes(o.status)).map(o=>(
+      <Card key={o.id} style={{marginBottom:12}}>
+        <div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}>
+          <div><div style={{fontWeight:800,color:C.navy}}>{o.customer}</div><div style={{fontSize:11,color:C.g400}}>{o.id} · {o.phone}</div></div>
+          <StatusBadge status={o.status}/>
+        </div>
+        <div style={{background:C.g50,borderRadius:9,padding:10,marginBottom:10,fontSize:12,color:C.g600}}>📍 {o.address}</div>
+        <div style={{display:"flex",gap:8}}>
+          <Btn size="sm" color={C.blue} style={{flex:1}}>📍 Directions</Btn>
+          {o.status==="pickup_scheduled"&&<Btn size="sm" color={C.gold} style={{flex:1}}>✅ Picked Up</Btn>}
+          {o.status==="ready"&&<Btn size="sm" color={C.ok} style={{flex:1}}>✅ Delivered</Btn>}
+          <Btn size="sm" outline color={C.blue}>📷</Btn>
+        </div>
+      </Card>
+    ))}
+  </div>
+);
+
+// OPS PORTAL
+const OpsHome = ()=>{
+  const [orders,setOrders]=React.useState(ORDERS);
+  const next={picked_up:"washing",washing:"drying",drying:"ironing",ironing:"quality_check",quality_check:"ready"};
+  const proc=orders.filter(o=>["picked_up","washing","drying","ironing","quality_check"].includes(o.status));
+  return(
+    <div>
+      <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:20}}>
+        <Stat label="Queue" value={proc.length} icon="⚙️" color={C.blue}/>
+        <Stat label="Washing" value={orders.filter(o=>o.status==="washing").length} icon="🫧" color={C.info}/>
+        <Stat label="Ready" value={orders.filter(o=>o.status==="ready").length} icon="📦" color={C.gold}/>
+      </div>
+      <Card style={{marginBottom:16}}>
+        <SH title="🔍 Scan Order"/>
+        <div style={{display:"flex",gap:10}}>
+          <input placeholder="Scan or type Order ID..." style={{flex:1,padding:"10px 12px",borderRadius:9,border:`1.5px solid ${C.g200}`,fontSize:13,outline:"none"}}/>
+          <Btn color={C.gold}>📷 Scan</Btn>
+        </div>
+      </Card>
+      <div style={{fontWeight:800,color:C.navy,marginBottom:12}}>Processing Queue</div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:12}}>
+        {proc.map(o=>{
+          const s=STATUSES.find(x=>x.key===o.status);
+          return(
+            <Card key={o.id} style={{border:`2px solid ${s?.color}22`}}>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+                <span style={{fontWeight:800,color:C.blue,fontSize:13}}>{o.id}</span>
+                <StatusBadge status={o.status}/>
+              </div>
+              <div style={{fontWeight:700,color:C.navy,marginBottom:3}}>{o.customer}</div>
+              <div style={{fontSize:12,color:C.g400,marginBottom:10}}>{o.weight}kg</div>
+              <div style={{display:"flex",gap:8}}>
+                {next[o.status]&&(
+                  <Btn size="sm" color={s?.color} onClick={()=>setOrders(p=>p.map(x=>x.id===o.id?{...x,status:next[o.status]}:x))} style={{flex:1}}>
+                    → {STATUSES.find(x=>x.key===next[o.status])?.label}
+                  </Btn>
+                )}
+                <Btn size="sm" outline color={C.err}>⚠️</Btn>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+const SECTION_TITLES = {
+  dashboard:"Dashboard",orders:"Orders",customers:"Customers",services:"Services & Pricing",
+  riders:"Riders",inventory:"Inventory",subscriptions:"Subscriptions",pos:"POS System",
+  reports:"Reports",notifications:"Notifications",staff:"Staff & Roles",
+  home:"Home",place_order:"Place Order",my_orders:"My Orders",track:"Track Order",
+  pricing:"Pricing",myplan:"My Plan",loyalty:"Rewards",referral:"Refer & Earn",
+  rider_home:"My Tasks",pickups:"Pickups",deliveries:"Deliveries",
+  ops_home:"Operations",processing:"Processing",scanning:"Scan Orders",
+};
+
+const renderSection = (role, active, setActive) => {
+  if(role==="admin"){
+    switch(active){
+      case "dashboard": return <AdminDash/>;
+      case "orders": return <Orders/>;
+      case "customers": return <Customers/>;
+      case "services": return <Services/>;
+      case "riders": return <Riders/>;
+      case "inventory": return <Inventory/>;
+      case "subscriptions": return <Subscriptions/>;
+      case "pos": return <POS/>;
+      case "reports": return <Reports/>;
+      case "notifications": return <Notifications/>;
+      case "staff": return <Staff/>;
+      default: return <AdminDash/>;
+    }
+  }
+  if(role==="customer"){
+    switch(active){
+      case "home": return <CustHome setActive={setActive}/>;
+      case "place_order": return <PlaceOrder/>;
+      case "my_orders": return <div><Card><SH title="My Orders"/>{ORDERS.map(o=><div key={o.id} style={{display:"flex",justifyContent:"space-between",padding:"10px 0",borderBottom:`1px solid ${C.g100}`}}><div><div style={{fontWeight:700,fontSize:12}}>{o.id}</div><div style={{fontSize:10,color:C.g400}}>{o.services.join(", ")}</div></div><div style={{textAlign:"right"}}><StatusBadge status={o.status}/><div style={{fontSize:11,fontWeight:700,color:C.gold,marginTop:2}}>{fc(o.amount)}</div></div></div>)}</Card></div>;
+      case "track": return <TrackOrder/>;
+      case "pricing": return <div><Card><SH title="Pricing"/><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(150px,1fr))",gap:10}}>{SERVICES.map(s=><div key={s.id} style={{background:C.g50,borderRadius:12,padding:14,textAlign:"center"}}><div style={{fontSize:28,marginBottom:6}}>{s.icon}</div><div style={{fontWeight:700,color:C.navy,fontSize:13}}>{s.name}</div><div style={{fontSize:11,color:C.g400,marginBottom:6}}>{s.unit}</div><div style={{fontWeight:900,color:C.gold,fontSize:16}}>{fc(s.price)}</div></div>)}</div></Card></div>;
+      case "myplan": return <MyPlan/>;
+      case "loyalty": return <Loyalty/>;
+      case "referral": return <Referral/>;
+      default: return <CustHome setActive={setActive}/>;
+    }
+  }
+  if(role==="rider") return <RiderHome/>;
+  if(role==="operations") return <OpsHome/>;
+  return <AdminDash/>;
+};
+
+// MAIN APP
+const App = ()=>{
+  const [role,setRole]=React.useState("admin");
+  const [active,setActive]=React.useState("dashboard");
+  const [collapsed,setCollapsed]=React.useState(false);
+
+  return(
+    <div style={{display:"flex",minHeight:"100vh",background:C.g50,fontFamily:"'Plus Jakarta Sans',sans-serif"}}>
+      <Sidebar role={role} setRole={r=>{setRole(r);setActive(r==="admin"?"dashboard":r==="customer"?"home":r==="rider"?"rider_home":"ops_home");}}
+        active={active} setActive={setActive} collapsed={collapsed} setCollapsed={setCollapsed}/>
+      <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden",minWidth:0}}>
+        <Topbar role={role} section={SECTION_TITLES[active]||"Dashboard"}/>
+        <main style={{flex:1,overflowY:"auto",padding:"20px"}}>
+          <div style={{maxWidth:1100,margin:"0 auto"}}>
+            {renderSection(role,active,setActive)}
+          </div>
+        </main>
+        <div style={{background:C.white,borderTop:`1px solid ${C.g100}`,padding:"8px 20px",display:"flex",justifyContent:"space-between",fontSize:10,color:C.g400}}>
+          <span>© 2024 DBlessed Laundry and Services Ltd</span>
+          <span style={{color:C.ok}}>● All systems operational</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
